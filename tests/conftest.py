@@ -73,3 +73,13 @@ def telemetry(tenant_api_client):
     from framework.api.telemetry import Telemetry
 
     return Telemetry(tenant_api_client)
+
+@pytest.fixture
+def energy_meter(devices, request):
+    cleanup_enabled = getattr(request, "param", True)
+    device = devices.create("test-energy-meter")
+
+    try:
+        yield device
+    finally:
+        devices.cleanup(device.id, enabled=cleanup_enabled)

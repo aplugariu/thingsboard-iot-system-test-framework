@@ -1,4 +1,3 @@
-from contextlib import contextmanager
 from dataclasses import dataclass
 from uuid import uuid4
 
@@ -45,7 +44,32 @@ class Devices:
             return False
         self._expect(response, 200)
         return True
+    
+    def create(
+        self, name_prefix: str, device_type: str = "default"
+    ) -> Device:
+        name = f"{name_prefix}-{uuid4().hex}"
+        response = self.client.post(
+            "/api/device",
+            json={"name": name, "type": device_type},
+        )
+        self._expect(response, 200)
+        data = response.json()
 
+        return Device(
+            id=data["id"]["id"],
+            name=data["name"],
+            type=data["type"],
+        )
+
+    def cleanup(self, device_id: str, enabled: bool = True):
+        if not enabled:
+            print(f"\nDevice kept for inspection: {device_id}")
+            return
+
+        if self.exists(device_id):
+            self.delete(device_id) 	
+	
     def access_token(self, device_id: str) -> str:
         response = self.client.get(f"/api/device/{device_id}/credentials")
         if response.status_code != 200:
@@ -64,23 +88,5 @@ class Devices:
         return token
 	
 
-    @contextmanager
-    def managed_device(self, name_prefix: str, device_type: str = "default"):
-        name = f"{name_prefix}-{uuid4().hex}"
-        response = self.client.post(
-            "/api/device",
-            json={"name": name, "type": device_type},
-        )
-        self._expect(response, 200)
-        data = response.json()
-        device_id = data["id"]["id"]
-
-        try:
-            assert data["id"]["entityType"] == "DEVICE"
-            assert data["name"] == name
-            assert data["type"] == device_type
-            yield Device(id=device_id, name=name, type=device_type)
-        finally:
-            if self.exists(device_id):
-                self.delete(device_id)
+   
     
