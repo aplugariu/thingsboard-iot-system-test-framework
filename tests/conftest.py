@@ -49,3 +49,10 @@ def tenant_api_client(api_client):
     assert user["authority"] == "TENANT_ADMIN"
 
     return api_client
+
+
+@pytest.fixture
+def devices(tenant_api_client):
+    from framework.api.devices import Devices
+
+    return Devices(tenant_api_client)
