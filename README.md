@@ -128,3 +128,34 @@ Authentication negative coverage:
 
 All three authentication cases passed locally.
 Expired tokens, invalid signatures and role-based authorization are not yet covered.
+
+## Tenant device tests
+
+Local setup:
+- Tenant: Smart Energy Test Lab
+- Tenant administrator: qa.admin@example.com
+- Created manually through the UI and activated using an activation link.
+
+Before running the full suite, configure tenant credentials in PowerShell:
+
+```powershell
+$env:TB_TENANT_USERNAME = "qa.admin@example.com"
+$tenantCredential = Get-Credential -UserName $env:TB_TENANT_USERNAME -Message "Tenant administrator password"
+$env:TB_TENANT_PASSWORD = $tenantCredential.GetNetworkCredential().Password
+Remove-Variable tenantCredential
+```
+
+Keep TB_USERNAME and TB_PASSWORD configured for the system administrator test.
+
+Device lifecycle coverage:
+- Authenticate as TENANT_ADMIN.
+- Create a device with a unique name.
+- Read it back and verify its ID, name and type.
+- Delete it and verify that subsequent retrieval returns HTTP 404.
+- Attempt cleanup through a pytest finalizer if intermediate checks fail.
+
+Four test cases passed locally. No MQTT connection or telemetry is tested yet.
+
+Tenant provisioning is currently manual and must be repeated if the database
+volume is deleted. Cleanup requires the API to remain reachable and cannot
+run if the test process is forcibly terminated.
