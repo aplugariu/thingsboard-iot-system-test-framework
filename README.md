@@ -1,4 +1,4 @@
-@'
+﻿@'
 # ThingsBoard IoT System Test Framework
 
 System and integration testing project around ThingsBoard Community Edition,
@@ -13,7 +13,7 @@ Phase 0 environment verified manually:
 - ThingsBoard HTTP response: 200
 - System administrator login successful
 
-No automated test suites have been implemented yet.
+First automated REST test verified: administrator login and authenticated user identity.
 
 ## Environment
 
@@ -89,3 +89,35 @@ These capabilities are planned, not implemented.
 
 https://thingsboard.io/docs/installation/docker-windows/
 '@ | Set-Content -Encoding UTF8 README.md
+
+## Python API tests
+
+Verified locally with Python 3.14.7.
+
+Create the virtual environment and install dependencies:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+With ThingsBoard running, configure the local test account and run:
+
+```powershell
+$env:TB_BASE_URL = "http://localhost:8080"
+$env:TB_USERNAME = "sysadmin@thingsboard.org"
+$env:TB_PASSWORD = "sysadmin"
+
+.\.venv\Scripts\python.exe -m pytest -v --tb=short
+```
+
+Credentials shown above belong to the local development installation.
+Environment variables must be set again in a new PowerShell session.
+
+The first test verifies:
+- Successful REST login
+- A non-empty access token
+- Authenticated access to the current-user endpoint
+- Expected email and SYS_ADMIN authority
+
+This test covers JWT login. API keys and tenant-level tests are not yet covered.
