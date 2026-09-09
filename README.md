@@ -121,3 +121,10 @@ The first test verifies:
 - Expected email and SYS_ADMIN authority
 
 This test covers JWT login. API keys and tenant-level tests are not yet covered.
+
+Authentication negative coverage:
+- Missing authentication header returns HTTP 401.
+- Malformed bearer token returns HTTP 401.
+
+All three authentication cases passed locally.
+Expired tokens, invalid signatures and role-based authorization are not yet covered.
