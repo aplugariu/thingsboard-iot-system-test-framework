@@ -56,3 +56,20 @@ def devices(tenant_api_client):
     from framework.api.devices import Devices
 
     return Devices(tenant_api_client)
+
+
+@pytest.fixture
+def mqtt_publisher():
+    from framework.mqtt.publisher import TelemetryPublisher
+
+    return TelemetryPublisher(
+        host=os.getenv("TB_MQTT_HOST", "127.0.0.1"),
+        port=int(os.getenv("TB_MQTT_PORT", "1883")),
+    )
+
+
+@pytest.fixture
+def telemetry(tenant_api_client):
+    from framework.api.telemetry import Telemetry
+
+    return Telemetry(tenant_api_client)

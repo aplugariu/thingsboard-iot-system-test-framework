@@ -46,6 +46,24 @@ class Devices:
         self._expect(response, 200)
         return True
 
+    def access_token(self, device_id: str) -> str:
+        response = self.client.get(f"/api/device/{device_id}/credentials")
+        if response.status_code != 200:
+            raise AssertionError(
+                f"Cannot read credentials for {device_id}: "
+                f"HTTP {response.status_code}"
+            )
+
+        credentials = response.json()
+        if credentials.get("credentialsType") != "ACCESS_TOKEN":
+            raise AssertionError("Device must use ACCESS_TOKEN credentials")
+
+        token = credentials.get("credentialsId")
+        if not isinstance(token, str) or not token:
+            raise AssertionError("Device access token is missing")
+        return token
+	
+
     @contextmanager
     def managed_device(self, name_prefix: str, device_type: str = "default"):
         name = f"{name_prefix}-{uuid4().hex}"
@@ -65,3 +83,4 @@ class Devices:
         finally:
             if self.exists(device_id):
                 self.delete(device_id)
+    
