@@ -1,0 +1,21 @@
+{
+  "name": "web-tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "private": true,
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.13.4",
+    "typescript": "7.0.2"
+  }
+}
