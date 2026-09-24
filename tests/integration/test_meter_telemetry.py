@@ -2,7 +2,7 @@ from time import time_ns
 
 import pytest
 
-@pytest.mark.parametrize("energy_meter", [False], indirect=True)
+@pytest.mark.parametrize("energy_meter", [True], indirect=True)
 def test_energy_meter_telemetry_reaches_platform(
     energy_meter, devices, mqtt_publisher, telemetry
 ):

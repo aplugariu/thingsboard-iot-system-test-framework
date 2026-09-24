@@ -3,7 +3,9 @@ import os
 
 import httpx
 import pytest
+from dotenv import load_dotenv
 
+load_dotenv()
 
 @pytest.fixture
 def api_client():
