@@ -59,6 +59,11 @@ def devices(tenant_api_client):
 
     return Devices(tenant_api_client)
 
+@pytest.fixture
+def device_profiles(tenant_api_client):
+    from framework.api.device_profiles import DeviceProfiles
+
+    return DeviceProfiles(tenant_api_client)
 
 @pytest.fixture
 def mqtt_publisher():
@@ -77,9 +82,20 @@ def telemetry(tenant_api_client):
     return Telemetry(tenant_api_client)
 
 @pytest.fixture
-def energy_meter(devices, request):
+def alarms(tenant_api_client):
+    from framework.api.alarms import Alarms
+
+    return Alarms(tenant_api_client)
+
+@pytest.fixture
+def energy_meter(devices, device_profiles, request):
     cleanup_enabled = getattr(request, "param", True)
-    device = devices.create("test-energy-meter")
+
+    profile = device_profiles.get_by_name("Energy Meter")
+    device = devices.create(
+        "test-energy-meter",
+        device_profile_id=profile.id,
+    )
 
     try:
         yield device

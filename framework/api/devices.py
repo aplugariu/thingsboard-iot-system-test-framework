@@ -9,7 +9,7 @@ class Device:
     id: str
     name: str
     type: str
-
+    device_profile_id: str | None = None	
 
 class Devices:
     def __init__(self, client: httpx.Client):
@@ -25,14 +25,20 @@ class Devices:
             )
 
     def get(self, device_id: str) -> Device:
-        response = self.client.get(f"/api/device/{device_id}")
-        self._expect(response, 200)
-        data = response.json()
-        return Device(
-            id=data["id"]["id"],
-            name=data["name"],
-            type=data["type"],
-        )
+            response = self.client.get(f"/api/device/{device_id}")
+            self._expect(response, 200)
+            data = response.json()
+
+            print("\nDEVICE KEYS:", data.keys())
+            print("DEVICE PROFILE FIELD:", data.get("deviceProfileId"))
+            print("DEVICE TYPE:", data.get("type"))
+
+            return Device(
+                    id=data["id"]["id"],
+                    name=data["name"],
+                    type=data["type"],
+                    device_profile_id=data.get("deviceProfileId", {}).get("id"),
+                )
 
     def delete(self, device_id: str):
         response = self.client.delete(f"/api/device/{device_id}")
@@ -46,12 +52,27 @@ class Devices:
         return True
     
     def create(
-        self, name_prefix: str, device_type: str = "default"
+        self,
+        name_prefix: str,
+        device_type: str = "default",
+        device_profile_id: str | None = None,
     ) -> Device:
         name = f"{name_prefix}-{uuid4().hex}"
+
+        payload = {
+            "name": name,
+            "type": device_type,
+        }
+
+        if device_profile_id is not None:
+            payload["deviceProfileId"] = {
+                "entityType": "DEVICE_PROFILE",
+                "id": device_profile_id,
+            }
+
         response = self.client.post(
             "/api/device",
-            json={"name": name, "type": device_type},
+            json=payload,
         )
         self._expect(response, 200)
         data = response.json()

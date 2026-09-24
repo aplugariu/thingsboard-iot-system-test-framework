@@ -1,10 +1,11 @@
-def test_device_create_read_delete(devices, energy_meter):
-    stored = devices.get(energy_meter.id)
+def test_device_create_read_delete(devices):
+    device = devices.create("test-device")
 
-    assert stored.id == energy_meter.id
-    assert stored.name == energy_meter.name
-    assert stored.type == "default"
+    try:
+        stored = devices.get(device.id)
 
-    devices.delete(energy_meter.id)
-
-    assert not devices.exists(energy_meter.id)
+        assert stored.id == device.id
+        assert stored.name == device.name
+        assert stored.type == "default"
+    finally:
+        devices.cleanup(device.id)

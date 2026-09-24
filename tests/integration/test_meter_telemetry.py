@@ -4,8 +4,16 @@ import pytest
 
 @pytest.mark.parametrize("energy_meter", [True], indirect=True)
 def test_energy_meter_telemetry_reaches_platform(
-    energy_meter, devices, mqtt_publisher, telemetry
-):
+    energy_meter,
+    devices,
+    device_profiles,
+    mqtt_publisher,
+    telemetry,
+    ):  
+    expected_profile = device_profiles.get_by_name("Energy Meter")
+    stored_device = devices.get(energy_meter.id)
+
+    assert stored_device.device_profile_id == expected_profile.id   
     measurement = {
         "voltage": 230.4,
         "current": 10.0,
